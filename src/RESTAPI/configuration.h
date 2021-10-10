@@ -3,6 +3,7 @@
 
 String configuration(String json);
 int getVersion();
+String getFirmware();
 String getType();
 bool isTypeLocked();
 void setTypeLocked(bool value);

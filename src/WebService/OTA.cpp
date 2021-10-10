@@ -36,9 +36,13 @@ void setLoginPage() {
 	loginPage = "";
 	String page =
 	"<form name=loginForm>"
-	"<h1>ESP32 Login</h1>"
-	"<h2>Type: ";
+	"<h1>ESP32 Firmware: ";
 	loginPage = page;
+	loginPage.concat(getFirmware());
+	page = 
+	"</h1>"
+	"<h2>Type: ";
+	loginPage.concat(page);
 	loginPage.concat(getType());
 
 	page =

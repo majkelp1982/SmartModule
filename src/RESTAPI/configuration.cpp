@@ -5,6 +5,8 @@
 #include <Sensors/Sensors.h>
 #include <Pins/Pins.h>
 
+#define FIRMWARE              "20211010.20"
+
 String validation();
 String pinParsing();
 String sensorsParsing();
@@ -128,6 +130,10 @@ String validation() {
 
 int getVersion() {
     return version;
+}
+
+String getFirmware() {
+  return FIRMWARE;
 }
 
 String getType() {
