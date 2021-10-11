@@ -158,3 +158,9 @@ bool isTypeLocked() {
 void setTypeLocked(bool value) {
   typeLocked = value;
 }
+
+bool isConfigurationReady() {
+  if (version == 0)
+    digitalWrite(BUILTIN_LED, blink1Hz());
+  else digitalWrite(BUILTIN_LED, HIGH);
+}

@@ -2,6 +2,7 @@
 #include <WiFi/WiFi_Network.h>
 #include <WebService/WebService.h>
 #include <Pins/Pins.h>
+#include <RESTAPI/configuration.h>
 
   void setup() {
   Serial.begin(9600);
@@ -14,6 +15,7 @@
 
 void loop() {
   WiFi_conectionCheck();
+  isConfigurationReady();
   webService_run();
   scanPins();
 }

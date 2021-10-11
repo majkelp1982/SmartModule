@@ -8,3 +8,4 @@ String getType();
 bool isTypeLocked();
 void setTypeLocked(bool value);
 uint16_t getTypeHash();
+bool isConfigurationReady();
