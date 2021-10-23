@@ -1,13 +1,21 @@
 #include <WiFi/WiFi_Network.h>
 
+bool isConnected = false;
+
 void waitTillConnected() {
 	while (WiFi.status() != WL_CONNECTED) {
+		isConnected = false;
 		Serial.print(".");
 		digitalWrite(BUILTIN_LED,LOW);
 		delay(50);
 		digitalWrite(BUILTIN_LED,HIGH);
 		delay(50);
   }
+  if (!isConnected)
+  	Serial.println(WiFi.localIP());
+
+isConnected = true;
+
 }
   
 
