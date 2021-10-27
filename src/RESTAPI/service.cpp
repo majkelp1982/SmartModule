@@ -21,7 +21,23 @@ String action(String json) {
     Serial.println(error.f_str());
     return RESP_JSON_DESERIALIZATION_FAILED;
   }
-  Serial.println("Deserialization done");
+
+  String requestVersion = docu["version"];
+  Serial.print("\nrequest version: "+requestVersion);
+  if ((requestVersion == NULL) || (requestVersion=="")) {
+    Serial.print("\n");
+    Serial.print(RESP_VERSION_MISSING);
+    return RESP_VERSION_MISSING;
+  }
+
+
+  if (requestVersion != getVersion()) {
+    Serial.print("\n");
+    Serial.print(RESP_VERSION_NOT_EQUAL);
+    return RESP_VERSION_NOT_EQUAL;
+  }
+
+  Serial.print("\nDeserialization done");
   Serial.print("\npins parsing");
   response = pinAction();
   if (response != RESP_OK)
@@ -38,9 +54,9 @@ String pinAction() {
   JsonObject root = docu["pins"].as<JsonObject>();
   String result;
   for (JsonPair kv : root) {
-    String pinStr = getString(kv.key().c_str());
-    String stateStr = getString(kv.value()["state"]);
-    String latchStr = getString(kv.value()["latch"]);
+    String pinStr = toString(kv.key().c_str());
+    String stateStr = toString(kv.value()["state"]);
+    String latchStr = toString(kv.value()["latch"]);
 
     result = writePin(pinStr, stateStr, latchStr);
     if (result != RESP_OK)
@@ -56,7 +72,7 @@ String sensorsAction() {
   JsonArray senorsArray = docu["sensors"];
   for (JsonVariant sensorName : senorsArray) {
     String response = "";
-    String nameStr = getString(sensorName.as<char*>());
+    String nameStr = toString(sensorName.as<char*>());
     Serial.print("\nSensor name: "+nameStr);
     response = sensorRead(nameStr);
     if (response[0] != '{')

@@ -96,6 +96,13 @@ void webServerSetup() {
 			server.send(404, "text/plain", RESP_JSON_NOT_FOUND);
 			return;
 		}
+
+		if (getVersion() == "") {
+			Serial.print(RESP_CONFIGURATION_MISSING);
+			server.send(501, "text/plain", RESP_CONFIGURATION_MISSING);
+			return;
+		}
+
 		Serial.print("\nAction start");
 		String response = action(server.arg("plain"));
 		Serial.print("\nAction end. Response: "+response);

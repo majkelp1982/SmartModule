@@ -14,7 +14,7 @@ void sensorBME280(JsonPair pair);
 uint16_t getHashedType(String type);
 
 //Fields
-int version=0;
+String version="";
 String type="";
 uint16_t typeHash=0;
 bool typeLocked;
@@ -40,8 +40,8 @@ String configuration(String json) {
  if (response != RESP_OK)
       return response;
 
-  version = doc["version"].as<int>();
-  type = getString(doc["type"]);
+  version = toString(doc["version"]);
+  type = toString(doc["type"]);
   typeHash = getHashedType(type);
 
   response = pinParsing();
@@ -59,49 +59,62 @@ String configuration(String json) {
 
 String sensorsParsing() {
   Serial.print("\nsensorsParsing");
-  JsonObject root = doc["sensors"].as<JsonObject>();
   sensorsReset();
-  for (JsonPair kv : root) {
-     String nameStr = getString(kv.key().c_str()); 
-     String typeStr = getString(kv.value()["type"]);
-     if (typeStr == BME280SPI) {
-       String csPinStr = getString(kv.value()["cspin"]);
-       sensorBME280SPI(nameStr, csPinStr.toInt());
+  String response = "REPS_OK";
+  for (JsonObject sensor : doc["sensorDaoSet"].as<JsonArray>()) {
+    String sensorName = toString(sensor["name"]);
+    String sensorType = toString(sensor["type"]);
+    if (sensorType == BME280SPI) {
+      response = sensorBME280SPI(sensorName, sensor["csPin"]);
+      if (response != RESP_OK)
+        return response;
      }
-   }
+         
+  }
    Serial.print("\nsensorsParsing done");
  return RESP_OK;
 }
 
 String pinParsing() {
    Serial.print("\npinParsing");
-  JsonObject root = doc["pins"].as<JsonObject>();
   pinsReset();
-  for (JsonPair kv : root) {
-    String pinStr = getString(kv.key().c_str());
-    int pinInt = pinStr.toInt();
-    if (pinInt == 0)
-      return RESP_PINS_NO_DESERIALIZATION;
+  for (JsonObject pinDao : doc["pinDaoSet"].as<JsonArray>()) {
+    int pinNumber = pinDao["pinNumber"];
+    String pinMode = toString(pinDao["mode"]);
+    String pinStandby = toString(pinDao["standby"]);
+    int pinLatchTime = pinDao["latchTime"];
 
-    String modeStr = getString(kv.value()["mode"]);
-    String standbyStr = getString(kv.value()["standby"]);
+    //data validation
+    if (pinNumber == 0)
+      return RESP_PIN_NO_MISSING;
+    
+    if ((pinMode == NULL) || (pinMode == ""))
+      return RESP_PIN_MODE_MISSING;
 
-    String response = setPinMap(pinInt, modeStr, standbyStr);
+    if ((pinStandby == NULL) || (pinStandby == ""))
+      return RESP_PIN_STANDBY_MISSING;
+
+    if (pinLatchTime == 0)
+      return RESP_PIN_LATCHTIME_MISSING;
+ 
+    //Set pin
+    String response = setPinMap(pinNumber, pinMode, pinStandby, pinLatchTime);
     if (response != RESP_OK)
-      return response;
+      return response;  
   }
+
     Serial.print("\npinParsing done");
    return RESP_OK;
 }
 
 String validation() {
-     Serial.print("\nvalidation");
+     Serial.print("\nvalidation\n");
   if (doc["type"].isNull()) {
       Serial.println(RESP_TYPE_MISSING);
       return RESP_TYPE_MISSING;
   }
 
-  uint16_t configType = getHashedType(getString(doc["type"]));
+  uint16_t configType = getHashedType(toString(doc["type"]));
   if (typeHash!=0 && typeHash!=configType && typeLocked) {
       Serial.println("\nWrong module type. Modul type is "+type+ ". Configuration is for "+configType+". To change \"typeLock\" need to be unlocked.");
       return RESP_TYPE_INCORRECT;
@@ -112,12 +125,12 @@ String validation() {
       return RESP_VERSION_MISSING;
   }
 
-  if (doc["pins"].isNull())  {
+  if (doc["pinDaoSet"].isNull())  {
       Serial.println(RESP_PINS_MISSING);
       return RESP_PINS_MISSING;
   }
   
-  if (doc["sensors"].isNull()) {
+  if (doc["sensorDaoSet"].isNull()) {
     Serial.println(RESP_SENSORS_MISSING);
     return RESP_SENSORS_MISSING;
   }
@@ -128,7 +141,7 @@ String validation() {
   return RESP_OK;
 }
 
-int getVersion() {
+String getVersion() {
     return version;
 }
 
@@ -159,8 +172,8 @@ void setTypeLocked(bool value) {
   typeLocked = value;
 }
 
-bool isConfigurationReady() {
-  if (version == 0)
+void isConfigurationReady() {
+  if (version == "")
     digitalWrite(BUILTIN_LED, blink1Hz());
   else digitalWrite(BUILTIN_LED, HIGH);
 }

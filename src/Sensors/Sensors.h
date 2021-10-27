@@ -17,4 +17,4 @@ struct Sensor {
 
 void sensorsReset();
 String sensorRead(String name);
-void sensorBME280SPI(String name, int8_t csPin);
+String sensorBME280SPI(String name, int8_t csPin);

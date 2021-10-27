@@ -21,7 +21,7 @@ struct Pin {
     unsigned long latchTimeMs;
 };
 
-String setPinMap(int pinInt, String modeStr, String standbyStr);
+String setPinMap(int pinNumber, String pinMod, String pinStandby, int pinLatchTime);
 String writePin(String pin, String state, String latchTimeMs);
 void pinsReset();
 void scanPins();

@@ -31,7 +31,9 @@ String sensorRead(String name) {
     return response;
 }
 
-void sensorBME280SPI(String name, int8_t csPin) {
+String sensorBME280SPI(String name, int8_t csPin) {
+    if (csPin == 0)
+        return RESP_CS_PIN_MISSING;
     Adafruit_BME280* sensor = new Adafruit_BME280(csPin, SPI_MOSI, SPI_MISO, SPI_SCK);
     sensors[nextFreeSensor].name = name;
     sensors[nextFreeSensor].type = BME280SPI;
@@ -39,6 +41,7 @@ void sensorBME280SPI(String name, int8_t csPin) {
     sensors[nextFreeSensor].bme280->begin();
     Serial.printf("\nSensor BME280SPI saved on position %d, name:%s, csPin:%d",nextFreeSensor, sensors[nextFreeSensor].name, csPin);
     nextFreeSensor++;  
+    return RESP_OK;
 }
 
 String sensorBME280SPIread(int sensorIndex) {

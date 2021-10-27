@@ -8,7 +8,7 @@ bool empty(String text) {
    return false;
 }
 
-String getString(const char* value) {
+String toString(const char* value) {
     String result = value;
     return result;
 }
