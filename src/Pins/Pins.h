@@ -18,10 +18,11 @@ struct Pin {
     byte pinNumber;
     byte mode;
     byte standby;
+    unsigned long defaultLatchTimeMs;
     unsigned long latchTimeMs;
 };
 
 String setPinMap(int pinNumber, String pinMod, String pinStandby, int pinLatchTime);
-String writePin(String pin, String state, String latchTimeMs);
+String writePin(int pin, String state);
 void pinsReset();
 void scanPins();

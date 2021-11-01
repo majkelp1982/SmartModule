@@ -23,46 +23,48 @@ String setPinMap(int pinNumber, String pinMod, String pinStandby, int pinLatchTi
           return result;
     }
 
-    int standbyInt = 0;
+    int standbyInt = -1;
     if (pinStandby == state_HIGH) standbyInt = HIGH;
-    else if (pinStandby == state_LOW) standbyInt = LOW; 
-    else {
+    else if (pinStandby == state_LOW) standbyInt = LOW;
+
+    if ((modeInt == OUTPUT || modeInt == OUTPUT_OPEN_DRAIN) && standbyInt == -1) {
           String result = RESP_PIN_BAD_DECLARATION;
-          result.concat(" on pin:");
+          result.concat(". Pin:");
           result.concat(pinNumber);
-      result = RESP_PIN_BAD_DECLARATION;
-      result.concat(" standby "+pinStandby+" is not recognized.");
+          result.concat(" is an output. Standby "+pinStandby+" is not recognized.");
       return result;
     }
+    
     mapper[pinNumber] = nextFree;
     pins[nextFree].mode = modeInt;
     pins[nextFree].standby = standbyInt;
     pins[nextFree].pinNumber = pinNumber;
+    pins[nextFree].latchTimeMs = pinLatchTime;
     nextFree++;
 
     pinMode(pinNumber, pins[mapper[pinNumber]].mode);
-    digitalWrite(pinNumber, pins[mapper[pinNumber]].standby);
+    if (modeInt == OUTPUT && modeInt == OUTPUT_OPEN_DRAIN) 
+        digitalWrite(pinNumber, pins[mapper[pinNumber]].standby);
     Serial.print("\nsetPinMap done");
     return RESP_OK;
 }
 
-String writePin(String pin, String state, String latchTimeMs) {
-    Serial.print("\nwritePin pin:"+pin+ " state:"+state+" latchTime:"+latchTimeMs);
-
-    int pinInt = pin.toInt();
-    int latchTimeMsInt = latchTimeMs.toInt();
-    if ((pinInt == 0) || (latchTimeMsInt == 0))
+String writePin(int pin, String state) {
+    Serial.printf("\nwritePin pin:%d state: %s",pin, state);
+    if (pin == 0)
         return RESP_PIN_BAD_DECLARATION;
     byte pinState = (state == state_LOW)? LOW : (state == state_HIGH)? HIGH : 10;
     if (pinState == 10) {
         String resp = RESP_PIN_BAD_DECLARATION;
-        resp.concat(" pin:"+pin+" state:"+state+" not recognized");
+        resp.concat(" pin:");
+        resp.concat(pin);
+        resp.concat(" state:"+state+" not recognized");
         return RESP_PIN_BAD_DECLARATION;
     }
 
-    pins[mapper[pinInt]].latchTimeMs = millis() + latchTimeMsInt;
+    pins[mapper[pin]].latchTimeMs = millis() + pins[mapper[pin]].defaultLatchTimeMs;
 
-    digitalWrite(pinInt, pinState);
+    digitalWrite(pin, pinState);
     return RESP_OK;
 }
 

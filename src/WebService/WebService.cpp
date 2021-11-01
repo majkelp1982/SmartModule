@@ -106,7 +106,9 @@ void webServerSetup() {
 		Serial.print("\nAction start");
 		String response = action(server.arg("plain"));
 		Serial.print("\nAction end. Response: "+response);
-	    server.send((response==RESP_OK)?200:400, "text/plain", response); 
+		if (response[0] != '{')
+			server.send(400, "plain/text", "FAULT"); 
+		else server.send(200, "application/json", response); 
 	  });
 
 	  //Params

@@ -21,12 +21,14 @@ bool typeLocked;
 
 //Help variable
 const char* tmpChar;
-StaticJsonDocument<500> doc;
+StaticJsonDocument<2500> doc;
 
 String configuration(String json) {
+
   Serial.print("\nconfiguration");
 
   doc.clear();
+  doc.garbageCollect();
   DeserializationError error = deserializeJson(doc, json);
   if (error) {
     Serial.print(F("deserializeJson() failed: "));
@@ -35,8 +37,6 @@ String configuration(String json) {
   }
 
   String response = validation();
-  Serial.println(response);
- 
  if (response != RESP_OK)
       return response;
 
@@ -60,8 +60,8 @@ String configuration(String json) {
 String sensorsParsing() {
   Serial.print("\nsensorsParsing");
   sensorsReset();
-  String response = "REPS_OK";
-  for (JsonObject sensor : doc["sensorDaoSet"].as<JsonArray>()) {
+  String response = RESP_OK;
+  for (JsonObject sensor : doc["sensorConfigDtoSet"].as<JsonArray>()) {
     String sensorName = toString(sensor["name"]);
     String sensorType = toString(sensor["type"]);
     if (sensorType == BME280SPI) {
@@ -71,40 +71,31 @@ String sensorsParsing() {
      }
          
   }
-   Serial.print("\nsensorsParsing done");
- return RESP_OK;
+  Serial.print("\nsensorsParsing done");
+  return response;
 }
 
 String pinParsing() {
    Serial.print("\npinParsing");
   pinsReset();
-  for (JsonObject pinDao : doc["pinDaoSet"].as<JsonArray>()) {
+  for (JsonObject pinDao : doc["pinConfigDtoSet"].as<JsonArray>()) {
     int pinNumber = pinDao["pinNumber"];
     String pinMode = toString(pinDao["mode"]);
     String pinStandby = toString(pinDao["standby"]);
-    int pinLatchTime = pinDao["latchTime"];
+    int pinLatchTime = pinDao["defaultLatchTime"];
 
     //data validation
     if (pinNumber == 0)
       return RESP_PIN_NO_MISSING;
-    
-    if ((pinMode == NULL) || (pinMode == ""))
-      return RESP_PIN_MODE_MISSING;
 
-    if ((pinStandby == NULL) || (pinStandby == ""))
-      return RESP_PIN_STANDBY_MISSING;
-
-    if (pinLatchTime == 0)
-      return RESP_PIN_LATCHTIME_MISSING;
- 
     //Set pin
     String response = setPinMap(pinNumber, pinMode, pinStandby, pinLatchTime);
     if (response != RESP_OK)
       return response;  
   }
 
-    Serial.print("\npinParsing done");
-   return RESP_OK;
+  Serial.print("\npinParsing done");
+  return RESP_OK;
 }
 
 String validation() {
@@ -125,12 +116,12 @@ String validation() {
       return RESP_VERSION_MISSING;
   }
 
-  if (doc["pinDaoSet"].isNull())  {
+  if (doc["pinConfigDtoSet"].isNull())  {
       Serial.println(RESP_PINS_MISSING);
       return RESP_PINS_MISSING;
   }
   
-  if (doc["sensorDaoSet"].isNull()) {
+  if (doc["sensorConfigDtoSet"].isNull()) {
     Serial.println(RESP_SENSORS_MISSING);
     return RESP_SENSORS_MISSING;
   }

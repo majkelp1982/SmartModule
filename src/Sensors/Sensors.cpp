@@ -49,13 +49,15 @@ String sensorBME280SPIread(int sensorIndex) {
     float temperature = sensors[sensorIndex].bme280->readTemperature();
     float pressure = sensors[sensorIndex].bme280->readPressure();
     float humidity = sensors[sensorIndex].bme280->readHumidity();
-    String response="{\""+sensors[sensorIndex].name+"\":{\"temperature\":";
+    String response;
+    response.concat("{");
+    response.concat("\"temperature\":");
     response.concat(temperature);
-    response.concat(",\"pressure:");
+    response.concat(",\"pressure\":");
     response.concat(pressure);
-    response.concat(",\"humidity:");
+    response.concat(",\"humidity\":");
     response.concat(humidity);
-    response.concat("},");
+    response.concat("}");
     Serial.print("\nsensorBEM280SPIread done");
     return response;
 }
@@ -75,4 +77,12 @@ void sensorsReset() {
         sensors[i].type = "";
     }
     nextFreeSensor = 0;
+}
+
+String getSensorType(String name) {
+    for (int i=0; i<(sizeof sensors); i++) {
+        if (sensors[i].name == name)
+            return sensors[i].type;
+    }
+    return RESP_SENSOR_NOT_FOUND;
 }

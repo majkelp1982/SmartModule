@@ -18,3 +18,4 @@ struct Sensor {
 void sensorsReset();
 String sensorRead(String name);
 String sensorBME280SPI(String name, int8_t csPin);
+String getSensorType(String name);
