@@ -11,7 +11,7 @@
 
 #define SSID                    "Majkel"
 #define PASS                    "12345678"
-#define MANAGERURL              "http://192.168.0.105:9999/settings"
+#define MANAGERURL              "http://192.168.0.200:9999/settings"
 
 void waitTillConnected();
 void WiFi_network();

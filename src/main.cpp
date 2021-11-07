@@ -3,8 +3,14 @@
 #include <WebService/WebService.h>
 #include <Pins/Pins.h>
 #include <RESTAPI/configuration.h>
+#include <esp_task_wdt.h>
 
   void setup() {
+  
+  //Watchdog
+  esp_task_wdt_init(30, true); //enable panic so ESP32 restarts
+	esp_task_wdt_add(NULL); //add current thread to WDT watch
+
   Serial.begin(9600);
   Serial.println("Serial started");
   WiFi_network();
@@ -18,4 +24,8 @@ void loop() {
   isConfigurationReady();
   webService_run();
   scanPins();
+
+  //Watchdog reset  
+  esp_task_wdt_reset();
+
 }
