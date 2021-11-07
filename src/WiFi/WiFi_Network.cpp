@@ -11,11 +11,12 @@ void waitTillConnected() {
 		digitalWrite(BUILTIN_LED,HIGH);
 		delay(50);
   }
-  if (!isConnected)
-  	Serial.println(WiFi.localIP());
+  if (!isConnected) {
+	  sendStatusToModulManager();
+	  Serial.println(WiFi.localIP());
+  }
 
 isConnected = true;
-
 }
   
 
@@ -37,4 +38,16 @@ void WiFi_conectionCheck() {
 
 String getMacAddress() {
 	return WiFi.macAddress();
+}
+
+void sendStatusToModulManager() {
+	Serial.print("\nSend params to module manager");
+	WiFiClient client;
+	HTTPClient http;
+	http.begin(client, MANAGERURL);
+	http.addHeader("Content-Type", "application/json");
+	int httpCode = http.POST(getDeviceParams());
+
+	Serial.printf("\nHTTP Code:%i",httpCode);
+	http.end();
 }

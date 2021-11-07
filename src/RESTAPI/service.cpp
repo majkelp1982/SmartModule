@@ -137,10 +137,11 @@ String getDeviceParams() {
   docu.clear();
 	String result;
 	docu["macAddress"] = getMacAddress();
+	docu["firmware"] = getFirmware();
   docu["version"] = getVersion();
-  docu["type"] = getType();
+  docu["moduleType"] = getType();
   docu["typeHash"] = getTypeHash();
-  docu["typeLocked"] = isTypeLocked();
+  docu["isTypeLocked"] = isTypeLocked();
 	serializeJson(docu, result);
 	return result;
 }

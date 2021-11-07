@@ -1,9 +1,4 @@
 #include <WebService/WebService.h>
-#include <WebService/OTA.h>
-#include <RESTAPI/configuration.h>
-#include <Model/HTTP_resp.h>
-#include <RESTAPI/service.h>
-#include <WiFi/WiFi_Network.h>
 
 WebServer server(80);
 

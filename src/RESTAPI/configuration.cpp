@@ -4,8 +4,7 @@
 #include <Model/HTTP_resp.h>
 #include <Sensors/Sensors.h>
 #include <Pins/Pins.h>
-
-#define FIRMWARE              "20211010.20"
+#include <WiFi/WiFi_Network.h>
 
 String validation();
 String pinParsing();
@@ -52,6 +51,9 @@ String configuration(String json) {
   if (response != RESP_OK)
     return response;  
  
+  //Sending new settings to Module manager
+  sendStatusToModulManager();
+
   //OK
   Serial.print("\nConfiguration done: Type: "+type+" Version: "+version);
   return RESP_OK;
