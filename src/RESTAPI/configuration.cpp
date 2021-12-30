@@ -168,5 +168,5 @@ void setTypeLocked(bool value) {
 void isConfigurationReady() {
   if (version == "")
     digitalWrite(BUILTIN_LED, blink1Hz());
-  else digitalWrite(BUILTIN_LED, HIGH);
+  else digitalWrite(BUILTIN_LED, LOW);
 }

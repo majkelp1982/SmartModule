@@ -2,7 +2,7 @@
 #include <ArduinoJson.h>
 
 
-#define FIRMWARE              "20211107.02"
+#define FIRMWARE              "20211230.01"
 
 String configuration(String json);
 String getVersion();
